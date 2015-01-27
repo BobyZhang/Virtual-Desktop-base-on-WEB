@@ -1,0 +1,128 @@
+﻿body, h2 {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.windows {
+    position: relative;
+	top: 100px;
+	left: 100px;
+	width: 300px;
+	height: 170px;
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgb(199, 199, 199);
+    border-radius: 3px;
+    box-shadow: 0 1px 3px 2px rgb(199, 199, 199);
+}
+
+.windows .title {
+    height: auto;
+    margin: 5px;
+}
+
+.windows .title h2 {
+    font-size:14px;
+	height:27px;
+	line-height:24px;
+	border-bottom:1px solid #A1B4B0;
+}
+
+.windows .title .operation {
+	position: absolute;
+	height: 19px;
+	top: 6px;
+	right: 10px;
+}
+
+.windows .title a {
+	float: left;
+	width: 21px;
+	height: 19px;
+	display: block;
+	margin-left: 5px;
+	background: url(../images/tool.png) no-repeat;
+}
+
+.windows .title a.min {
+	background-position:-29px 0;
+}
+.windows .title a.min:hover {
+	background-position:-29px -29px;
+}
+.windows .title a.max {
+	background-position:-60px 0;
+}
+.windows .title a.max:hover {
+	background-position:-60px -29px;
+}
+.windows .title a.revert {
+	background-position:-149px 0;
+	display:none;
+}
+.windows .title a.revert:hover {
+	background-position:-149px -29px;
+}
+.windows .title a.close {
+	background-position:-89px 0;
+}
+.windows .title a.close:hover {
+	background-position:-89px -29px;
+}
+
+.windows .content {
+    font-size: 14px;
+    margin: 0 5px;
+    overflow: auto;
+}
+
+.windows .reszie {
+    position: absolute;
+	overflow: hidden;
+	opacity: 0;
+}
+.windows .resizeL, .windows .resizeR {
+	top: 0;
+	width: 5px;
+	height: 100%;
+	cursor: w-resize;
+}
+.windows .resizeR {
+	right: 0;
+}
+.windows .resizeT, .windows .resizeB {
+	width: 100%;
+	height: 5px;
+	cursor: n-resize;
+}
+.windows .resizeT {
+	top: 0;
+}
+.windows .resizeB {
+	bottom: 0;
+}
+.windows .resizeLT, .windows .resizeRT, 
+.windows .resizeLB, .windows .resizeRB {
+	width: 10px;
+	height: 10px;
+}
+.windows .resizeLT {
+	top: 0;
+	left: 0;
+	cursor: nw-resize;
+}
+.windows .resizeRT {
+	top: 0;
+	right: 0;
+	cursor: ne-resize;
+}
+.windows .resizeLB {
+	left: 0;
+	bottom: 0;
+	cursor: ne-resize;
+}
+.windows .resizeRB {
+    right: 0;
+    bottom: 0;
+    cursor: nw-resize;
+}

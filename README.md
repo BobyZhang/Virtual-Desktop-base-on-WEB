@@ -1,7 +1,8 @@
-# Virtual-Desktop-base-on-WEB
+# Step1 - A movable window
 
 ----
 
-I will do it step by step!
+Realize a window:
 
-From 2015.01.27
++ Movable
++ Resizable
