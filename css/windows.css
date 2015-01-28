@@ -1,4 +1,8 @@
-﻿body, h2 {
+﻿
+body {
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,9 +23,12 @@
 .windows .title {
     height: auto;
     margin: 5px;
+    cursor: move;
 }
 
 .windows .title h2 {
+    margin: 0;
+    padding: 0;
     font-size:14px;
 	height:27px;
 	line-height:24px;
@@ -35,7 +42,7 @@
 	right: 10px;
 }
 
-.windows .title a {
+.windows .title a, a.open {
 	float: left;
 	width: 21px;
 	height: 19px;
@@ -69,6 +76,16 @@
 .windows .title a.close:hover {
 	background-position:-89px -29px;
 }
+.windows .title .open {
+	position:absolute;
+	top:10px;
+	left:50%;
+	margin-left:-10px;
+	background-position:0 0;
+}
+a.open:hover {
+	background-position:0 -29px;
+}
 
 .windows .content {
     font-size: 14px;
@@ -76,12 +93,16 @@
     overflow: auto;
 }
 
-.windows .reszie {
+/*.windows .resizeL, .windows .reszieR,
+.windows .reszieT, .windows .reszieB,
+.windows .reszieLT, .windows .reszieLB,
+.windows .reszieRT, .windows .reszieRB {
     position: absolute;
 	overflow: hidden;
 	opacity: 0;
-}
+}*/
 .windows .resizeL, .windows .resizeR {
+    position: absolute;
 	top: 0;
 	width: 5px;
 	height: 100%;
@@ -91,6 +112,7 @@
 	right: 0;
 }
 .windows .resizeT, .windows .resizeB {
+    position: absolute;
 	width: 100%;
 	height: 5px;
 	cursor: n-resize;
@@ -103,6 +125,7 @@
 }
 .windows .resizeLT, .windows .resizeRT, 
 .windows .resizeLB, .windows .resizeRB {
+    position: absolute;
 	width: 10px;
 	height: 10px;
 }

@@ -6,3 +6,7 @@ Realize a window:
 
 + Movable
 + Resizable
+
+## Bug
+
++ When resize
