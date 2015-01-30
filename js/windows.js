@@ -21,11 +21,32 @@ var get = {
 };
 
 
+//
+// OO part
+//
+
+function Windows() {
+
+    // create the node
+    this.node = document.createElement("div");
+    this.node.className = "windows";
+    this.node.innerHTML = windowsHTML;
+    document.getElementsByTagName("body")[0].appendChild(this.node);
+
+    // some attribute
+    this.isMax = false;    // mark the window if the window is maximize status
+    this.zIndex = ++maxIndex;    // about z-index
+
+    // set zIndex
+    this.node.style.zIndex = this.zIndex;
+}
+
 /***************************************
     drag 
 ***************************************/
+Windows.prototype.drag = function () {
 
-function drag(_windows) {
+    var _windows = this.node;
 
     // disX = the distance of point to window's edge
     var disX = disY = 0;
@@ -53,7 +74,7 @@ function drag(_windows) {
             // cLeft = the changed left position
             var cLeft = event.clientX - disX;
             var cTop = event.clientY - disY;
-            
+
 
             // limit the movable range (left and top)
             cLeft <= 0 && (cLeft = 0);
@@ -129,17 +150,17 @@ function drag(_windows) {
     Resize
 ********************************************/
 
-function resize(_windows, _handle, isLeft, isTop, lockX, lockY) {
+Windows.prototype.resize = function (_windows, _handle, isLeft, isTop, lockX, lockY) {
     // 
     _handle.onmousedown = function (event) {
         // get event
         var event = event || window.event;
 
         // record position and size
-        var windowLeft   =  _windows.offsetLeft;
-        var windowTop    =  _windows.offsetTop;
-        var windowWidth  =  _windows.offsetWidth;
-        var windowHeight =  _windows.offsetHeight;
+        var windowLeft = _windows.offsetLeft;
+        var windowTop = _windows.offsetTop;
+        var windowWidth = _windows.offsetWidth;
+        var windowHeight = _windows.offsetHeight;
 
         // disX = the distance of point to window's edge
         var disX = event.clientX - _handle.offsetLeft;
@@ -149,9 +170,14 @@ function resize(_windows, _handle, isLeft, isTop, lockX, lockY) {
             // get event
             var event = event || window.event;
 
+
             // cLeft = the changed position
             var cLeft = event.clientX - disX;
             var cTop = event.clientY - disY;
+
+            // when the size is min, can'nt move windows
+            var minLeft = windowLeft + windowWidth - minWindowsWidth;
+            var minTop = windowTop + windowHeight - minWindowsHeight;
 
             // finLeft = finaly position
             var finLeft = windowLeft + cLeft;
@@ -160,8 +186,11 @@ function resize(_windows, _handle, isLeft, isTop, lockX, lockY) {
             // limit the left and top direction
             finLeft < 0 && (finLeft = 0);
             finTop < 0 && (finTop = 0);
+            // limit move, when the size can small
+            finLeft > minLeft && (finLeft = minLeft);
+            finTop > minTop && (finTop = minTop);
 
-            // if left and top resize, change the position
+            // set position
             isLeft && (_windows.style.left = finLeft + "px");
             isTop && (_windows.style.top = finTop + "px");
 
@@ -176,16 +205,11 @@ function resize(_windows, _handle, isLeft, isTop, lockX, lockY) {
             // change size
             cWidth < minWindowsWidth && (cWidth = minWindowsWidth);
             cWidth > maxW && (cWidth = maxW);
-            lockX || (_windows.style.width = cWidth + "px");
+            if (event.clientX > 0) lockX || (_windows.style.width = cWidth + "px");
 
             cHeight < minWindowsHeight && (cHeight = minWindowsHeight);
-            cHeight > maxH && (cHeight = macH);
-            lockY || (_windows.style.height = cHeight + "px");
-
-            // TODO
-            if ((isLeft && iW == minWindowsWidth) || (isTop && iH == minWindowsHeight)) {
-                document.onmousemove = null;
-            }
+            cHeight > maxH && (cHeight = maxH);
+            if (event.clientY > 0) lockY || (_windows.style.height = cHeight + "px");
 
             return false;
         }
@@ -195,27 +219,42 @@ function resize(_windows, _handle, isLeft, isTop, lockX, lockY) {
             document.onmouseup = null;
         };
         return false;
-        
+
     }
 
 }
 
 /******************************************
-  A function to band event
+   Index event
+ *****************************************/
+
+Windows.prototype.indexEvent = function () {
+
+    var _windows = this.node;
+    alert(_windows);
+
+    this.node.onmousedown = function () {
+        // changed scoping, so this.style not this.node.style
+        this.style.zIndex = ++maxIndex;
+
+    }
+
+}
+
+/******************************************
+  A function to band event for window
  ******************************************/
 
-function windowBandEvent(_windows) {
-    drag(_windows);
+Windows.prototype.windowBandEvent = function () {
+
+    var _windows = this.node;
+
+    // drag function
+    this.drag();
+    // control z-index
+    this.indexEvent();
 
     // direction
-    //var wL = _windows.getElementsByClassName("resizeL")[0];
-    //var wR = _windows.getElementsByClassName("resizeR")[0];
-    //var wT = _windows.getElementsByClassName("resizeT")[0];
-    //var wB = _windows.getElementsByClassName("resizeB")[0];
-    //var wLT = _windows.getElementsByClassName("resizeLT")[0];
-    //var wLB = _windows.getElementsByClassName("resizeLB")[0];
-    //var wRT = _windows.getElementsByClassName("resizeRT")[0];
-    //var wRB = _windows.getElementsByClassName("resizeRB")[0];
     var wL = get.byClass("resizeL", _windows)[0];
     var wR = get.byClass("resizeR", _windows)[0];
     var wT = get.byClass("resizeT", _windows)[0];
@@ -225,16 +264,22 @@ function windowBandEvent(_windows) {
     var wRT = get.byClass("resizeRT", _windows)[0];
     var wRB = get.byClass("resizeRB", _windows)[0];
 
-    resize(_windows, wL, true, false, false, true);
-    resize(_windows, wT, false, true, true, false);
-    resize(_windows, wR, false, false, false, true);
-    resize(_windows, wB, false, false, true, false);
-    resize(_windows, wLT, true, true, false, false);
-    resize(_windows, wRT, false, true, false, false);
-    resize(_windows, wRB, false, false, false, false);
-    resize(_windows, wLB, true, false, false, false);
+    // resize function
+    this.resize(_windows, wL, true, false, false, true);
+    this.resize(_windows, wT, false, true, true, false);
+    this.resize(_windows, wR, false, false, false, true);
+    this.resize(_windows, wB, false, false, true, false);
+    this.resize(_windows, wLT, true, true, false, false);
+    this.resize(_windows, wRT, false, true, false, false);
+    this.resize(_windows, wRB, false, false, false, false);
+    this.resize(_windows, wLB, true, false, false, false);
 }
 
+//
+//
+// So named main
+//
+//
 
 // set min and max
 var minWindowsWidth = 300;
@@ -242,12 +287,18 @@ var minWindowsHeight = 170;
 var maxWindowsWidth = document.documentElement.clientWidth;
 var maxWindowsHeight = document.documentElement.clientHeight;
 
+// windowsHTML
+var windowsHTML = "<div class=\"title\"><h2>This is a movable window</h2><div class=\"operation\"><a class=\"min\" href=\"javascript:;\" title=\"minimize\"></a><a class=\"max\" href=\"javascript:;\" title=\"maximize\"></a><a class=\"revert\" href=\"javascript:;\" title=\"revert\"></a><a class=\"close\" href=\"javascript:;\" title=\"close\"></a></div></div><div class=\"content\">1. This window is movable <br />2. This window is resizable from eight directions <br />3. Support Minimize, Maxinize, Revert and Close <br />4. Limit the minWidth and minHeight <br /></div><div class=\"resizeL\"></div><div class=\"resizeR\"></div><div class=\"resizeT\"></div><div class=\"resizeB\"></div><div class=\"resizeLT\"></div><div class=\"resizeLB\"></div><div class=\"resizeRT\"></div><div class=\"resizeRB\"></div>";
+
+// max index
+var maxIndex = 1;  // mark the 
+
 window.onload = window.onresize = function () {
 
-    var wDrag = document.getElementsByClassName("windows")[0];
+    //var wDrag = document.getElementsByClassName("windows")[0];
 
-    windowBandEvent(wDrag);
-
-    
-
+    //windowBandEvent(wDrag);
+    var newWindows = new Windows();
+    newWindows.windowBandEvent();
 }
+
