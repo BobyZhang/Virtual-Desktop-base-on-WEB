@@ -32,9 +32,15 @@ function Windows() {
     this.node.className = "windows";
     this.node.innerHTML = windowsHTML;
     document.getElementsByTagName("body")[0].appendChild(this.node);
+    // task-bar node
+    this.taskBarNode = document.createElement("div");
+    this.taskBarNode.className = "taskbar-windows";
+    this.taskBarNode.innerHTML = "TEMP";
+    document.getElementById("task-bar").appendChild(this.taskBarNode);
 
     // some attribute
     this.isMax = false;    // mark the window if the window is maximize status
+    this.isTop = true;    // mark the window if the window is maximize status
     this.zIndex = ++maxIndex;    // about z-index
 
     // set zIndex
@@ -46,7 +52,9 @@ function Windows() {
 ***************************************/
 Windows.prototype.drag = function () {
 
+    var obj = this;
     var _windows = this.node;
+    var _taskBarWindows = this.taskBarNode;
 
     // disX = the distance of point to window's edge
     var disX = disY = 0;
@@ -130,7 +138,7 @@ Windows.prototype.drag = function () {
         wMax.style.display = "Block";
     }
 
-    // click min and close
+    // click min 
     wMin.onclick = function () {
         _windows.style.display = "none";
         var wA = document.createElement("a");
@@ -144,6 +152,16 @@ Windows.prototype.drag = function () {
             this.onclick = null;
         };
     };
+
+    // click close
+    // TODO
+    wClose.onclick = function () {
+        
+        // remove node
+        document.getElementsByTagName("body")[0].removeChild(_windows);
+        document.getElementById("task-bar").removeChild(_taskBarWindows);
+        delete this;
+    }
 }
 
 /*******************************************
@@ -230,8 +248,6 @@ Windows.prototype.resize = function (_windows, _handle, isLeft, isTop, lockX, lo
 
 Windows.prototype.indexEvent = function () {
 
-    var _windows = this.node;
-    alert(_windows);
 
     this.node.onmousedown = function () {
         // changed scoping, so this.style not this.node.style
