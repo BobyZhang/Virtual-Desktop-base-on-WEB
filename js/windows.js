@@ -26,6 +26,7 @@ var get = {
 //
 
 function Windows() {
+    windowsArray.push(this);
 
     // create the node
     this.node = document.createElement("div");
@@ -40,13 +41,18 @@ function Windows() {
 
     // some attribute
     this.isMax = false;    // mark the window if the window is maximize status
-    this.isTop = true;    // mark the window if the window is maximize status
-    this.zIndex = ++maxIndex;    // about z-index
+    this.isTop = true;     // mark the window if the window is inTop
+    this.isBotton = false; // mark the window if the window is minimize status
+                           // for all windows is in bottom
 
     // set zIndex
-    this.node.style.zIndex = this.zIndex;
+    changeWindowsArray("change", windowsArray.length - 1);
+
+    // add event
+    this.windowBandEvent();  
 }
 
+Windows.prototype.constructor = Windows;
 /***************************************
     drag 
 ***************************************/
@@ -140,17 +146,13 @@ Windows.prototype.drag = function () {
 
     // click min 
     wMin.onclick = function () {
+
+        obj.isBotton = true;  // mark 
         _windows.style.display = "none";
-        var wA = document.createElement("a");
-        wA.className = "open";
-        wA.href = "javascript:;";
-        wA.title = "Revert";
-        document.body.appendChild(wA);
-        wA.onclick = function () {
-            _windows.style.display = "block";
-            document.body.removeChild(this);
-            this.onclick = null;
-        };
+
+        var n = windowsArray.indexOf(obj);
+        // change window-index, delete windows from windowsArray
+        changeWindowsArray("moveDown", n);
     };
 
     // click close
@@ -158,6 +160,10 @@ Windows.prototype.drag = function () {
     wClose.onclick = function () {
         
         // remove node
+        var n = windowsArray.indexOf(obj);
+        // change window-index, delete windows from windowsArray
+        changeWindowsArray("delete", n);
+
         document.getElementsByTagName("body")[0].removeChild(_windows);
         document.getElementById("task-bar").removeChild(_taskBarWindows);
         delete this;
@@ -248,10 +254,27 @@ Windows.prototype.resize = function (_windows, _handle, isLeft, isTop, lockX, lo
 
 Windows.prototype.indexEvent = function () {
 
+    var obj = this;
 
+    // click windows to change z-index
     this.node.onmousedown = function () {
-        // changed scoping, so this.style not this.node.style
-        this.style.zIndex = ++maxIndex;
+        
+        // ramark the this.index in windowsArray
+        var n = windowsArray.indexOf(obj);
+        changeWindowsArray("moveUp", n);
+
+    }
+
+    // click tast-bar to change z-index
+    this.taskBarNode.onclick = function () {
+
+        // show style
+        obj.node.style.display = "block";
+        obj.isBotton = false;
+
+        // ramark the this.index in windowsArray
+        var n = windowsArray.indexOf(obj);
+        changeWindowsArray("moveUp", n)
 
     }
 
@@ -303,6 +326,58 @@ var minWindowsHeight = 170;
 var maxWindowsWidth = document.documentElement.clientWidth;
 var maxWindowsHeight = document.documentElement.clientHeight;
 
+var windowsArray = new Array();
+
+function changeWindowsArray(_operation, _index) {
+    
+    // operationObj = the obj will be handled
+    var operationObj = windowsArray[_index];
+
+    var allWindowsBottom = true;
+
+    // if wMin.onclick
+    if (_operation == "moveDown") {
+
+        // move forward
+        for (var i = windowsArray.length - 1; i > 0; --i) {
+            windowsArray[i] = windowsArray[i - 1];
+        }
+
+        // set operation as the bottom of windowsArray
+        windowsArray[0] = operationObj;
+    }
+    
+    // if wClose.onclick or move windows to top
+    else {
+        // move back
+        for (var i = _index; i < windowsArray.length - 1; ++i) {
+            windowsArray[i] = windowsArray[i + 1];
+        }
+
+        // if wClose.onclick, delete operationObj and short down the last  
+        _operation == "delete" && (windowsArray.length = windowsArray.length - 1);
+
+        // if change the z-index, move operationObj the windowsArray.end
+        _operation == "moveUp" && (windowsArray[windowsArray.length - 1] = operationObj);
+    }
+
+    // changw style
+    for (var i = 0; i < windowsArray.length; ++i) {
+        // change the z-index
+        windowsArray[i].node.style.zIndex = i;
+        // change task-bar background-color
+        windowsArray[i].taskBarNode.style.backgroundColor = "rgba(255, 255, 255, 0)";
+
+        // if one is not bottom. allWindowsBottom is false
+        windowsArray[i].isBotton == false && (allWindowsBottom = false);
+    }
+
+    // change the top windows's tast-bar background-color
+    // if windowsArrat != 0 and allWindowsBottom is true
+    (windowsArray.length == 0 || allWindowsBottom == true) || 
+        (windowsArray[windowsArray.length - 1].taskBarNode.style.backgroundColor = "rgba(255, 255, 255, 0.15)");
+}
+
 // windowsHTML
 var windowsHTML = "<div class=\"title\"><h2>This is a movable window</h2><div class=\"operation\"><a class=\"min\" href=\"javascript:;\" title=\"minimize\"></a><a class=\"max\" href=\"javascript:;\" title=\"maximize\"></a><a class=\"revert\" href=\"javascript:;\" title=\"revert\"></a><a class=\"close\" href=\"javascript:;\" title=\"close\"></a></div></div><div class=\"content\">1. This window is movable <br />2. This window is resizable from eight directions <br />3. Support Minimize, Maxinize, Revert and Close <br />4. Limit the minWidth and minHeight <br /></div><div class=\"resizeL\"></div><div class=\"resizeR\"></div><div class=\"resizeT\"></div><div class=\"resizeB\"></div><div class=\"resizeLT\"></div><div class=\"resizeLB\"></div><div class=\"resizeRT\"></div><div class=\"resizeRB\"></div>";
 
@@ -315,6 +390,9 @@ window.onload = window.onresize = function () {
 
     //windowBandEvent(wDrag);
     var newWindows = new Windows();
-    newWindows.windowBandEvent();
+    var new2 = new Windows();
+    var new3 = new Windows();
+    
+
 }
 
